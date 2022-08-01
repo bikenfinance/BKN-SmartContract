@@ -134,8 +134,6 @@ library Address {
 
 contract Ownable is Context {
     address private _owner;
-    address private asdasd;
-    uint256 private _lockTime;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -421,16 +419,6 @@ contract BikeN is Context, IERC20, Ownable {
     bool public checkWalletLimit = true;
 
     event SwapAndLiquifyEnabledUpdated(bool enabled);
-    event SwapAndLiquify(
-        uint256 tokensSwapped,
-        uint256 ethReceived,
-        uint256 tokensIntoLiqudity
-    );
-
-    event SwapETHForTokens(
-        uint256 amountIn,
-        address[] path
-    );
 
     event SwapTokensForETH(
         uint256 amountIn,
@@ -544,14 +532,18 @@ contract BikeN is Context, IERC20, Ownable {
         _buyTeamFee = newTeamTax;
 
         _totalTaxIfBuying = _buyLiquidityFee.add(_buyMarketingFee).add(_buyTeamFee);
+
+        require(_totalTaxIfBuying <= 10, "Invalid buy fee");
     }
 
-    function setSelTaxes(uint256 newLiquidityTax, uint256 newMarketingTax, uint256 newTeamTax) external onlyOwner() {
+    function setSellTaxes(uint256 newLiquidityTax, uint256 newMarketingTax, uint256 newTeamTax) external onlyOwner() {
         _sellLiquidityFee = newLiquidityTax;
         _sellMarketingFee = newMarketingTax;
         _sellTeamFee = newTeamTax;
 
         _totalTaxIfSelling = _sellLiquidityFee.add(_sellMarketingFee).add(_sellTeamFee);
+
+        require(_totalTaxIfSelling <= 10, "Invalid sell fee");
     }
 
     function setDistributionSettings(uint256 newLiquidityShare, uint256 newMarketingShare, uint256 newTeamShare) external onlyOwner() {
@@ -583,10 +575,12 @@ contract BikeN is Context, IERC20, Ownable {
     }
 
     function setMarketingWalletAddress(address newAddress) external onlyOwner() {
+        require(newAddress != address(0), "Invalid address");
         marketingWalletAddress = payable(newAddress);
     }
 
     function setTeamWalletAddress(address newAddress) external onlyOwner() {
+        require(newAddress != address(0), "Invalid address");
         teamWalletAddress = payable(newAddress);
     }
 
